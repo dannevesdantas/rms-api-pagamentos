@@ -8,6 +8,7 @@ import {
 import { IClienteDTOFactory } from 'src/domain/cliente/interfaces/cliente.dto.factory.port';
 import { IClienteRepository } from 'src/domain/cliente/interfaces/cliente.repository.port';
 import { IClienteUseCase } from 'src/domain/cliente/interfaces/cliente.use_case.port';
+import { IMessaging } from 'src/domain/common/interfaces/imessaging';
 import {
   AtualizaClienteDTO,
   ClienteDTO,
@@ -21,6 +22,8 @@ export class ClienteUseCase implements IClienteUseCase {
     private readonly clienteRepository: IClienteRepository,
     @Inject(IClienteDTOFactory)
     private readonly clienteDTOFactory: IClienteDTOFactory,
+    @Inject(IMessaging)
+    private readonly messagingService: IMessaging,
   ) {}
 
   async listarClientes(): Promise<ClienteDTO[] | []> {
@@ -63,6 +66,8 @@ export class ClienteUseCase implements IClienteUseCase {
       criaClienteDTO.cpf,
     );
     const clienteCriado = await this.clienteRepository.criarCliente(cliente);
+    // Mandar msg pro SNS aqui
+    await this.messagingService.publish(cliente);
     const clienteDTO = this.clienteDTOFactory.criarClienteDTO(clienteCriado);
     return {
       mensagem: 'Cliente criado com sucesso',

@@ -9,6 +9,8 @@ import { ClienteModel } from '../infrastructure/sql/models/cliente.model';
 import { ClienteRepository } from '../infrastructure/sql/repositories/cliente/cliente.repository';
 import { ClienteController } from '../presentation/rest/v1/controllers/cliente/cliente.controller';
 import { SQLDTOFactory } from '../infrastructure/sql/factories/sql.dto.factory';
+import { IMessaging } from 'src/domain/common/interfaces/imessaging';
+import { SNSBus } from 'src/infrastructure/services/messaging/snsbus';
 
 @Module({
   imports: [TypeOrmModule.forFeature([ClienteModel])],
@@ -29,8 +31,12 @@ import { SQLDTOFactory } from '../infrastructure/sql/factories/sql.dto.factory';
       provide: IClienteDTOFactory,
       useClass: ClienteDTOFactory,
     },
+    {
+      provide: IMessaging,
+      useClass: SNSBus,
+    },
     SQLDTOFactory,
   ],
   exports: [IClienteUseCase, IClienteRepository, IClienteDTOFactory],
 })
-export class ClienteModule {}
+export class ClienteModule { }
